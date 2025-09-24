@@ -5,6 +5,7 @@ pipeline {
         APP_NAME = 'todo-app'
         DOCKER_IMAGE = "mayurj023/${APP_NAME}:${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = 'dockerhub' // Docker Hub username + token
+        GITHUB_CREDENTIALS = 'github-token'
     }
 
     stages {
