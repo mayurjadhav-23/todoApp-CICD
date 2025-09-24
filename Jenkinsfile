@@ -1,44 +1,58 @@
-pipeline{
+pipeline {
     agent { label "vinod" }
+
     environment {
         APP_NAME = 'todo-app'
         DOCKER_IMAGE = "mayurj023/${APP_NAME}:${BUILD_NUMBER}"
-        DOCKERHUB_CREDENTIALS = 'dockerhub'  // Docker Hub username + token
+        DOCKERHUB_CREDENTIALS = 'dockerhub' // Docker Hub username + token
     }
-    stages{
-        stage("Checkout"){
-            steps{
-                    scm Checkout
+
+    stages {
+        stage("Checkout") {
+            steps {
+                checkout scm
             }
         }
-        stage("Build"){
-            steps{
-                script{
-                    sh"docker build -t mayurj023/${APP_NAME}:${BUILD_NUMBER} ."
+
+        stage("Build") {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
-        stage('Push Docker Image') {
+
+        stage("Push Docker Image") {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}"
+                    withCredentials([usernamePassword(
+                        credentialsId: "${DOCKERHUB_CREDENTIALS}",
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh """
+                            echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                            docker push ${DOCKER_IMAGE}
+                        """
                     }
                 }
             }
         }
-        stage('Checkout K8S manifest SCM'){
+
+        stage("Checkout & Update K8S manifest SCM") {
             steps {
-                script{
-                    sh "cat deploy.yaml
-                        sed -i "s/32/${BUILD_NUMBER}/g" deploy.yaml
+                script {
+                    sh """
+                        cat deploy.yaml
+                        sed -i 's/32/${BUILD_NUMBER}/g' deploy.yaml
                         cat deploy.yaml
                         git add deploy.yaml
-                        git commit -m 'Updated the deploy yaml | Jenkins Pipeline'
+                        git commit -m 'Updated deploy.yaml | Jenkins Pipeline'
                         git remote -v
-                        git push"
+                        git push
+                    """
                 }
             }
         }
+    }
 }
