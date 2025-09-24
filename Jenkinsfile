@@ -44,10 +44,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                        cat deploy.yaml
+                        cat deploy/deploy.yaml
                         sed -i 's/32/${BUILD_NUMBER}/g' deploy.yaml
-                        cat deploy.yaml
-                        git add deploy.yaml
+                        cat deploy/deploy.yaml
+                        git add deploy/deploy.yaml
                         git commit -m 'Updated deploy.yaml | Jenkins Pipeline'
                         git remote -v
                         git push
