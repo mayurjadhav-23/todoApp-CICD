@@ -43,15 +43,27 @@ pipeline {
         stage("Checkout & Update K8S manifest SCM") {
             steps {
                 script {
-                    sh """
-                        cat deploy/deploy.yaml
-                        sed -i 's/32/${BUILD_NUMBER}/g' deploy/deploy.yaml
-                        cat deploy/deploy.yaml
-                        git add deploy/deploy.yaml
-                        git commit -m 'Updated deploy.yaml | Jenkins Pipeline'
-                        git remote -v
-                        git push
-                    """
+                    // Use GitHub credentials for authentication
+                    withCredentials([string(credentialsId: "${GITHUB_CREDENTIALS}", variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            # Configure git user (required for commits)
+                            git config user.email "mayurjadhav0232.com"
+                            git config user.name "mayurjadhav-23"
+                            
+
+                            cat deploy/deploy.yaml
+                            
+                            sed -i 's/32/${BUILD_NUMBER}/g' deploy/deploy.yaml
+                            
+                            cat deploy/deploy.yaml
+                            
+                            git add deploy/deploy.yaml
+                            git commit -m 'Updated deploy.yaml | Jenkins Pipeline Build ${BUILD_NUMBER}'
+                            
+                            # Push using the GitHub token
+                            git push https://\${GITHUB_TOKEN}@github.com/mayurjadhav-23/todoApp-CICD.git HEAD:main
+                        """
+                    }
                 }
             }
         }
