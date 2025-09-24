@@ -53,7 +53,7 @@ pipeline {
 
                             cat deploy/deploy.yaml
                             
-                            sed -i 's/32/${BUILD_NUMBER}/g' deploy/deploy.yaml
+                            sed -i 's/BUILD_NUMBER/${BUILD_NUMBER}/g' deploy/deploy.yaml
                             
                             cat deploy/deploy.yaml
                             
