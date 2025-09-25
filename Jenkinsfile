@@ -53,7 +53,7 @@ pipeline {
 
                             cat deploy/deploy.yaml
                             
-                            sed -i "s|mayurj023/todo-app:.*|mayurj023/todo-app:${BUILD_NUMBER}|g" deploy/deploy.yaml
+                            sed -i "s|mayurj023/todo-app:v.*|mayurj023/todo-app:${BUILD_NUMBER}|g" deploy/deploy.yaml
                             
                             cat deploy/deploy.yaml
                             
